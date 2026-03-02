@@ -1,0 +1,4 @@
+PyQt6==6.6.1
+PyQt6-WebEngine==6.6.0
+PyMuPDF==1.23.8
+gTTS==2.5.1 

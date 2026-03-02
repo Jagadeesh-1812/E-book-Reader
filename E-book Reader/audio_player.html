@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .audio-player {
+            width: 300px;
+            height: 60px;
+            background: #444;
+            border-radius: 5px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .play-btn, .pause-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .play-btn:hover, .pause-btn:hover {
+            background: #ddd;
+        }
+        
+        .play-icon, .pause-icon {
+            width: 20px;
+            height: 20px;
+            fill: #444;
+        }
+        
+        .progress-container {
+            flex-grow: 1;
+            height: 4px;
+            background: #666;
+            border-radius: 2px;
+            margin: 0 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #fff;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        
+        .time {
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            min-width: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="audio-player">
+        <div class="controls">
+            <button class="play-btn" id="playBtn">
+                <svg class="play-icon" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+            </button>
+            <button class="pause-btn" id="pauseBtn" style="display: none;">
+                <svg class="pause-icon" viewBox="0 0 24 24">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="time" id="timeDisplay">0:00</div>
+    </div>
+    
+    <audio id="audioPlayer" preload="auto"></audio>
+    
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeDisplay = document.getElementById('timeDisplay');
+        
+        function updateProgress() {
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            const minutes = Math.floor(audioPlayer.currentTime / 60);
+            const seconds = Math.floor(audioPlayer.currentTime % 60);
+            timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audioPlayer.duration;
+            audioPlayer.currentTime = (clickX / width) * duration;
+        }
+        
+        playBtn.addEventListener('click', () => {
+            audioPlayer.play();
+            playBtn.style.display = 'none';
+            pauseBtn.style.display = 'block';
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            pauseBtn.style.display = 'none';
+            playBtn.style.display = 'block';
+        });
+        
+        audioPlayer.addEventListener('timeupdate', updateProgress);
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            timeDisplay.textContent = '0:00';
+            progressBar.style.width = '0%';
+        });
+        progressContainer.addEventListener('click', setProgress);
+        
+        audioPlayer.addEventListener('ended', () => {
+            pauseBtn.style.display = 'none';
+            playBtn.style.display = 'block';
+            progressBar.style.width = '0%';
+            timeDisplay.textContent = '0:00';
+        });
+        
+        audioPlayer.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+            alert('Error playing audio. Please try again.');
+        });
+    </script>
+</body>
+</html> 
